@@ -76,7 +76,7 @@
   --accent:#10B981; --accent-soft:rgb(16, 185, 129); --accent-glow:rgba(16,185,129,.24);
   --bg:#080809; --bg-elev:#0F0F11; --surface:rgba(255,255,255,.03); --surface-border:rgba(255,255,255,.07);
   --text:#ECECEE; --text-dim:#92929A; --grain-opacity:.03;
-  --radius:10px; --radius-sm:8px; --maxw:780px; --ease:cubic-bezier(.22,1,.36,1); --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --radius:10px; --radius-sm:8px; --maxw:900px; --ease:cubic-bezier(.22,1,.36,1); --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1);
   --gap-lg:20px; --gap-md:14px; --gap-sm:8px; --section-spacing:46px;
   
   /* Dynamic Navbar & Dashboard Glass tokens */
@@ -177,7 +177,7 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
   opacity:0;pointer-events:none;transition:opacity .2s var(--ease-out),transform .2s var(--ease-out);white-space:nowrap}
 
 @media (min-width:992px){
-  .nav-dock{left:calc(50% - 450px);top:50%;transform:translateY(-50%);flex-direction:column;gap:8px}
+  .nav-dock{left:calc(45% - 450px);top:50%;transform:translateY(-50%);flex-direction:column;gap:8px}
   .nav-dock a .tooltip{right:auto;left:48px;top:50%;transform:translateY(-50%) translateX(-8px)}
   @media (hover:hover){.nav-dock a:hover{color:var(--accent);background:var(--surface);transform:scale(1.1)}}
   .nav-dock a:active{transform:scale(0.95);color:var(--accent)}
@@ -195,11 +195,15 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 
 /* ============================================================ HERO & BANNER ============================================================ */
 .hero-wrapper{position:relative}
-.banner-cover{width:100%;height:130px;border-radius:var(--radius);overflow:hidden;position:relative;background:#050507;
+.banner-cover{width:100%;height:200px;border-radius:var(--radius);overflow:hidden;position:relative;background:#050507;
   transition:background 1.5s var(--ease);z-index:1}
 [data-theme="light"] .banner-cover{background:#E2E8F0}
 .banner-cover svg{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
 .banner-weather-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;transition:opacity .6s var(--ease-out)}
+
+@media (min-width:992px){
+  .banner-cover{height:250px}
+}
 
 .banner-space-rect{fill:#07070a;transition:fill 1.5s var(--ease)}
 [data-theme="light"] .banner-space-rect{fill:#E2E8F0}
@@ -211,7 +215,7 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 [data-theme="light"] .banner-mountains-2{fill:#94A3B8}
 
 /* Profile overlay section */
-.profile-card{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-44px;padding:0 10px;position:relative;z-index:10;gap:12px;flex-wrap:wrap}
+.profile-card{display:flex;align-items:flex-end;justify-content:space-between;margin-top:33px;padding:0 10px;position:relative;z-index:10;gap:12px;flex-wrap:wrap}
 .profile-avatar{width:90px;height:90px;border-radius:18px;border:3px solid var(--bg);overflow:hidden;background:#222;flex-shrink:0;
   transition:border-color 1.5s var(--ease)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;transition:opacity 0.25s ease}
