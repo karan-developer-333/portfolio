@@ -165,11 +165,15 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 .nav-dock{position:fixed;z-index:1000;display:flex;background:var(--nav-bg);
   border:1px solid var(--surface-border);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   padding:6px;border-radius:30px;box-shadow:var(--nav-shadow)}
+.nav-indicator{position:absolute;top:0px;left:6px;width:36px;height:36px;background:var(--accent);
+  border-radius:50%;border:1.5px solid var(--accent);
+  transition:transform .35s var(--ease-out);pointer-events:none;z-index:0;opacity:0}
+.nav-indicator.show{opacity:.4}
 .nav-dock a{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:var(--text-dim);
   transition:color .25s var(--ease-out),background .25s var(--ease-out),transform .2s var(--ease-out);position:relative}
 @media (hover:hover){.nav-dock a:hover{color:var(--accent);background:var(--surface);transform:scale(1.1)}}
 .nav-dock a:active{transform:scale(0.95);color:var(--accent)}
-.nav-dock a.active{color:var(--accent);background:var(--accent-soft)}
+.nav-dock a.active{color:var(--accent)}
 .nav-dock a i{font-size:16px}
 .nav-dock a svg{width:16px;height:16px}
 .nav-dock a .tooltip{position:absolute;font-family:'JetBrains Mono';font-size:.65rem;color:var(--text);
@@ -186,6 +190,9 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 @media (max-width:991px){
   .nav-dock{bottom:16px;left:50%;transform:translateX(-50%);flex-direction:row;gap:10px;border-radius:24px}
   .nav-dock a .tooltip{bottom:48px;left:50%;transform:translateX(-50%) translateY(8px)}
+
+  .nav-indicator{position:absolute;top:6px;left:2px;width:36px;height:36px;background:var(--accent);
+    border-radius:50%;border:1.5px solid var(--accent)};
   @media (hover:hover){.nav-dock a:hover .tooltip{opacity:1;transform:translateX(-50%) translateY(0)}}
 }
 
@@ -200,6 +207,7 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 [data-theme="light"] .banner-cover{background:#E2E8F0}
 .banner-cover svg{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
 .banner-weather-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;transition:opacity .6s var(--ease-out)}
+.banner-clock{position:absolute;bottom:8px;right:10px;z-index:2;font-family:'JetBrains Mono';font-size:1.2rem;color:var(--text);pointer-events:none}
 
 @media (min-width:992px){
   .banner-cover{height:250px}
@@ -308,7 +316,7 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
   display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .25s var(--ease-out),border-color 1.5s var(--ease),box-shadow .25s var(--ease-out),background 1.5s var(--ease)}
 @media (hover:hover){.project:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,transparent);box-shadow:0 10px 30px -20px var(--accent-glow)}}
 
-.project-banner{height:80px;width:100%;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;position:relative;background:#151518}
+.project-banner{height:150px;width:100%;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;position:relative;background:#151518}
 .project-banner img,.project-banner svg{width:100%;height:100%;object-fit:cover;opacity:0.8;transition:transform .35s var(--ease-out)}
 @media (hover:hover){.project:hover .project-banner img,.project:hover .project-banner svg{transform:scale(1.04)}}
 
@@ -456,6 +464,7 @@ footer .accent{color:var(--accent)}
 .dev-btn{padding:4px 10px;border-radius:var(--radius-sm);font-size:.72rem;font-family:'JetBrains Mono';background:var(--surface);color:var(--text-dim);border:1px solid var(--surface-border);cursor:pointer;transition:all .15s var(--ease-out)}
 .dev-btn:hover{border-color:var(--accent);color:var(--text)}
 .dev-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
 </style>
 </head>
 <body class="bg-bg text-text font-sans antialiased selection:bg-accent-soft selection:text-accent">
@@ -467,6 +476,7 @@ footer .accent{color:var(--accent)}
 
 <!-- ===== FLOATING NAV DOCK ===== -->
 <nav class="nav-dock" id="navDock" aria-label="Quick navigation">
+  <div class="nav-indicator" id="navIndicator"></div>
   <a href="#hero" data-sec="hero" class="active"><i class="ri-home-line"></i><span class="tooltip">Home</span></a>
   <a href="#about" data-sec="about"><i class="ri-user-line"></i><span class="tooltip">About</span></a>
   <a href="#github" data-sec="github"><i class="ri-git-branch-line"></i><span class="tooltip">GitHub</span></a>
@@ -495,6 +505,7 @@ footer .accent{color:var(--accent)}
   <header class="hero-wrapper" id="hero">
     <div class="banner-cover">
       <img class="banner-weather-bg" id="weatherBg" alt="">
+      <span class="banner-clock" id="bannerClock">00:00:00</span>
     </div>
 
     <!-- Avatar & Info Card -->
@@ -552,16 +563,6 @@ footer .accent{color:var(--accent)}
         <a href="https://instagram.com/Karan_texh_lifestyle" target="_blank" class="pill-btn">Instagram</a>
       </div>
 
-      <!-- Tech Icons Strip -->
-      <div class="tech-strip">
-        <div class="tech-icon-wrapper" title="React"><img src="https://cdn.simpleicons.org/react/61DAFB" alt="React"></div>
-        <div class="tech-icon-wrapper" title="Node.js"><img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node.js"></div>
-        <div class="tech-icon-wrapper" title="TypeScript"><img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript"></div>
-        <div class="tech-icon-wrapper" title="MongoDB"><img src="https://cdn.simpleicons.org/mongodb/47A248" alt="MongoDB"></div>
-        <div class="tech-icon-wrapper" title="Tailwind CSS"><img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind CSS"></div>
-        <div class="tech-icon-wrapper" title="Express"><img src="https://cdn.simpleicons.org/express/ECECEC" alt="Express"></div>
-        <div class="tech-icon-wrapper" title="Git"><img src="https://cdn.simpleicons.org/git/F05032" alt="Git"></div>
-      </div>
     </div>
   </header>
 
@@ -605,60 +606,46 @@ footer .accent{color:var(--accent)}
     <h2 class="section-title gsap-fade">Featured projects</h2>
     <div class="projects-grid">
 
-      <!-- Project 1 -->
+      <!-- Instalert -->
       <article class="project gsap-fade">
         <div class="project-banner">
-          <svg viewBox="0 0 300 100" preserveAspectRatio="none">
-            <rect width="100%" height="100%" fill="#070d09"/>
-            <path d="M0 40 Q75 10 150 60 T300 40 L300 100 L0 100 Z" fill="#10B981" opacity="0.2"/>
-            <path d="M0 60 Q75 30 150 80 T300 60 L300 100 L0 100 Z" fill="#047857" opacity="0.3"/>
-          </svg>
+          <img src="website-preview/insta-alert.jpeg" alt="Instalert">
         </div>
         <div class="project-meta-row">
           <span class="project-status live"><span class="status-dot"></span>Live</span>
         </div>
-        <h3>PDF Shala</h3>
-        <p>A high-capacity PDF manipulation workspace — parsing, converting, and modifying complex structures with zero overhead.</p>
-        <div class="tags"><span class="tag">React</span><span class="tag">Node</span><span class="tag">MongoDB</span></div>
-        <a href="https://pdf-shala.onrender.com/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
+        <h3>Instalert</h3>
+        <p>Real-time Instagram alert system — never miss when someone you follow posts or goes live.</p>
+        <div class="tags"><span class="tag">React</span><span class="tag">Node</span></div>
+        <a href="https://hackthon1.lysis.in/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
       </article>
 
-      <!-- Project 2 -->
+      <!-- Course Finder -->
       <article class="project gsap-fade">
         <div class="project-banner">
-          <svg viewBox="0 0 300 100" preserveAspectRatio="none">
-            <rect width="100%" height="100%" fill="#0a0711"/>
-            <path d="M0 30 Q75 80 150 40 T300 70 L300 100 L0 100 Z" fill="#8B5CF6" opacity="0.2"/>
-            <path d="M0 50 Q75 90 150 60 T300 80 L300 100 L0 100 Z" fill="#10B981" opacity="0.15"/>
-          </svg>
+          <img src="website-preview/course-finder.png" alt="Course Finder">
+        </div>
+        <div class="project-meta-row">
+          <span class="project-status live"><span class="status-dot"></span>Live</span>
+        </div>
+        <h3>Course Finder</h3>
+        <p>Search and compare online courses across platforms — find the best learning path for your stack.</p>
+        <div class="tags"><span class="tag">React</span><span class="tag">Node</span><span class="tag">MongoDB</span></div>
+        <a href="https://couse-finder.lysis.in/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
+      </article>
+
+      <!-- Shadow Deploy -->
+      <article class="project gsap-fade">
+        <div class="project-banner">
+          <img src="website-preview/shadow-deploy.png" alt="Shadow Deploy">
         </div>
         <div class="project-meta-row">
           <span class="project-status live"><span class="status-dot"></span>Live</span>
         </div>
         <h3>Shadow Deploy</h3>
-        <p>An automated continuous integration pipeline simulator configured directly on Vercel architectures.</p>
+        <p>Preview deployments for every PR — automated staging environments with instant rollback.</p>
         <div class="tags"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span></div>
-        <a href="https://shadow-deploy.vercel.app/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
-      </article>
-
-
-
-      <!-- Project 4 -->
-      <article class="project gsap-fade">
-        <div class="project-banner">
-          <svg viewBox="0 0 300 100" preserveAspectRatio="none">
-            <rect width="100%" height="100%" fill="#070c0c"/>
-            <path d="M0 20 Q80 90 160 30 T300 60 L300 100 L0 100 Z" fill="#14B8A6" opacity="0.2"/>
-            <path d="M0 40 Q80 95 160 50 T300 80 L300 100 L0 100 Z" fill="#10B981" opacity="0.15"/>
-          </svg>
-        </div>
-        <div class="project-meta-row">
-          <span class="project-status live"><span class="status-dot"></span>Live</span>
-        </div>
-        <h3>Sync — MERN</h3>
-        <p>A secure multi-room collaborative synchronizer application featuring robust WebRTC data-layer fallbacks.</p>
-        <div class="tags"><span class="tag">MongoDB</span><span class="tag">Express</span><span class="tag">React</span></div>
-        <a href="https://sync-mern-app.onrender.com/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
+        <a href="https://shadow.lysis.in/" target="_blank" rel="noopener" class="project-link">View Project <i class="ri-arrow-right-line"></i></a>
       </article>
 
     </div>
@@ -1365,10 +1352,20 @@ window.addEventListener('DOMContentLoaded', () => {
   /* BOTTOM NAV SCROLL DETECTION */
   const navLinks = document.querySelectorAll('.nav-dock a');
   const secs = [...navLinks].map(a => document.getElementById(a.dataset.sec)).filter(Boolean);
+  const navIndicator = document.getElementById('navIndicator');
+  function moveIndicator() {
+    const active = document.querySelector('.nav-dock a.active');
+    if (!active || !navIndicator) return;
+    const vert = window.innerWidth >= 992;
+    navIndicator.style.transform = vert ? `translateY(${active.offsetTop}px)` : `translateX(${active.offsetLeft}px)`;
+    navIndicator.classList.add('show');
+  }
   const spy = new IntersectionObserver(es => {
-    es.forEach(en => { if(en.isIntersecting){ const id = en.target.id; navLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === id)); } });
+    es.forEach(en => { if(en.isIntersecting){ const id = en.target.id; navLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === id)); moveIndicator(); } });
   }, {rootMargin: '-35% 0px -35% 0px'});
   secs.forEach(s => spy.observe(s));
+  moveIndicator();
+  window.addEventListener('resize', moveIndicator);
 
   /* GSAP TRIGGER ANIMATIONS */
   if(window.gsap && window.ScrollTrigger && !reduce){
@@ -1463,6 +1460,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/* BANNER LIVE CLOCK */
+const clockEl = document.getElementById('bannerClock');
+function updateClock() {
+  const now = new Date();
+  clockEl.textContent = now.toLocaleTimeString('en-IN', { hour12: false });
+}
+updateClock();
+setInterval(updateClock, 1000);
 </script>
 </body>
 
