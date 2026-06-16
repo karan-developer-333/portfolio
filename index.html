@@ -304,8 +304,8 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 .gh-card h3{font-size:.9rem;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--text)}
 
 /* SVG Render Area Frame */
-.gh-2d-canvas{width:100%;background:var(--bg-elev);border:1px solid var(--surface-border);padding:12px;border-radius:var(--radius-sm);
-  position:relative;overflow:hidden;transition:background 1.5s var(--ease),border-color 1.5s var(--ease)}
+.gh-2d-canvas{width:100%;background:var(--bg-elev);border:1px solid var(--surface-border);padding:6px; border-radius:var(--radius-sm);
+  position:relative;overflow:hidden;transition:background 1.5s var(--ease),border-color 1.5s var(--ease);}
 .gh-2d-canvas svg{width:100%;height:auto;display:block;overflow:visible}
 
 
@@ -845,14 +845,14 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     const cols = Math.min(53, data.contributions.length);
-    const rows = 7;
-    const boxSize = 10, gap = 2;
+    const rows = 8;
+    const boxSize = 40, gap = 4;
     const width = cols * (boxSize + gap);
     const height = rows * (boxSize + gap) + 15;
 
     let svg = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">`;
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    svg += `<g font-family="Space Grotesk, sans-serif" font-size="7" fill="var(--text-dim)" opacity="0.8">`;
+    svg += `<g font-family="Space Grotesk, sans-serif" font-size="40" fill="var(--text-dim)" opacity="0.8">`;
     for (let i = 0; i < 12; i++) {
       svg += `<text x="${i * (width / 12) + 2}" y="${height - 2}">${months[i]}</text>`;
     }
@@ -877,12 +877,7 @@ window.addEventListener('DOMContentLoaded', () => {
     svg += `</svg>`;
     container.innerHTML = svg +
       `<div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--text-dim)">
-        <span>${totalContributions} contributions this year</span>
-        <span style="display:flex;align-items:center;gap:3px">
-          Less
-          <svg width="60" height="10" viewBox="0 0 60 10"><rect x="0" y="0" width="10" height="10" rx="2" fill="var(--surface-border)"/><rect x="12" y="0" width="10" height="10" rx="2" fill="color-mix(in srgb, var(--accent) 25%, var(--surface-border))"/><rect x="24" y="0" width="10" height="10" rx="2" fill="color-mix(in srgb, var(--accent) 50%, var(--surface-border))"/><rect x="36" y="0" width="10" height="10" rx="2" fill="color-mix(in srgb, var(--accent) 75%, var(--surface-border))"/><rect x="48" y="0" width="10" height="10" rx="2" fill="var(--accent)"/></svg>
-          More
-        </span>
+        
       </div>`;
 
     const style = document.createElement('style');
