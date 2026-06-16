@@ -130,7 +130,7 @@ section{padding:var(--section-spacing) 0;position:relative}
 body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-dock a, 
 .profile-card, .profile-avatar, .profile-handle, .weather-control-pill, .btn, .btn-primary, 
 .pill-btn, .tech-strip, .tech-icon-wrapper, .card, .stat .num, .stat .lbl, .learning-tag, 
-.gh-card, .gh-2d-canvas, .project, .tag, .timeline::before, .tl-item::before, .tl-item .yr, 
+.gh-card, .gh-2d-canvas, .project, .tag, 
 .contact-form input, .contact-form textarea, .social-link, .social-link svg, footer, footer .accent {
   transition: background-color 500ms var(--ease), 
               border-color 500ms var(--ease), 
@@ -337,14 +337,18 @@ body, .app-header, .logo, .logo span, .header-weather-widget, .nav-dock, .nav-do
 @media (max-width:760px){.projects-grid{grid-template-columns:1fr}}
 
 /* ============================================================ TIMELINE ============================================================ */
-.timeline{margin-top:12px;position:relative;padding-left:18px}
-.timeline::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:1.5px;background:var(--surface-border)}
-.tl-item{position:relative;padding-bottom:16px}
-.tl-item::before{content:"";position:absolute;left:-18px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.tl-item .yr{font-family:'JetBrains Mono';font-size:.68rem;color:var(--accent)}
-.tl-item h4{font-size:.90rem;margin:2px 0 1px}
-.tl-item .org{color:var(--text-dim);font-size:.78rem;margin-bottom:3px}
-.tl-item p{color:var(--text-dim);font-size:.80rem}
+.exp-wrap{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.exp-card{background:var(--surface);border:1px solid var(--surface-border);border-radius:var(--radius);padding:14px;
+  display:flex;gap:12px;transition:transform .25s var(--ease-out),border-color 1.5s var(--ease),box-shadow .25s var(--ease-out),background 1.5s var(--ease)}
+@media (hover:hover){.exp-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 50%,transparent);box-shadow:0 10px 30px -20px var(--accent-glow)}}
+.exp-icon{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;flex-shrink:0;color:var(--accent);font-size:16px}
+.exp-body{flex:1;min-width:0}
+.exp-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.exp-head .yr{font-family:'JetBrains Mono';font-size:.68rem;color:var(--accent);white-space:nowrap}
+.exp-head h4{font-size:.90rem;margin:0}
+.exp-tag{font-family:'JetBrains Mono';font-size:.62rem;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:8px;white-space:nowrap}
+.exp-card .org{color:var(--text-dim);font-size:.78rem;margin-bottom:3px}
+.exp-card p{color:var(--text-dim);font-size:.80rem}
 
 /* ============================================================ CONTACT ============================================================ */
 .contact-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-top:12px;align-items:start}
@@ -654,25 +658,41 @@ footer .accent{color:var(--accent)}
   <!-- ===== EXPERIENCE SECTION ===== -->
   <section id="experience">
     <span class="eyebrow gsap-fade">Journey</span>
-    <h2 class="section-title gsap-fade">Engineering Experience</h2>
-    <div class="timeline">
-      <div class="tl-item gsap-fade">
-        <span class="yr">2024 — Present</span>
-        <h4>Full-Stack Developer</h4>
-        <div class="org">Freelance / Self-driven</div>
-        <p>Designing modern application frameworks and writing modular, fast software interfaces.</p>
+    <h2 class="section-title gsap-fade">Experience</h2>
+    <div class="exp-wrap">
+      <div class="exp-card gsap-fade">
+        <div class="exp-icon"><i class="ri-briefcase-line"></i></div>
+        <div class="exp-body">
+          <div class="exp-head">
+            <span class="yr">2024 — Present</span>
+            <span class="exp-tag">Current</span>
+          </div>
+          <h4>Full-Stack Developer</h4>
+          <div class="org">Freelance / Self-driven</div>
+          <p>Building full-stack apps with React & Node. Focused on clean architecture, fast turnarounds, and real-world performance.</p>
+        </div>
       </div>
-      <div class="tl-item gsap-fade">
-        <span class="yr">2023 — 2024</span>
-        <h4>Full-Stack Developer</h4>
-        <div class="org">Projects & Open Source</div>
-        <p>Architected full MERN systems handling file streaming and concurrency processes cleanly.</p>
+      <div class="exp-card gsap-fade">
+        <div class="exp-icon"><i class="ri-code-s-slash-line"></i></div>
+        <div class="exp-body">
+          <div class="exp-head">
+            <span class="yr">2023 — 2024</span>
+          </div>
+          <h4>Full-Stack Developer</h4>
+          <div class="org">Projects & Open Source</div>
+          <p>Built MERN systems handling file streaming, real-time sync, and deployment pipelines. Shipped 10+ projects.</p>
+        </div>
       </div>
-      <div class="tl-item gsap-fade">
-        <span class="yr">2022</span>
-        <h4>Foundations</h4>
-        <div class="org">Development Beginning</div>
-        <p>Deep-dived into systems programming and functional programming paradigms using Javascript.</p>
+      <div class="exp-card gsap-fade">
+        <div class="exp-icon"><i class="ri-graduation-cap-line"></i></div>
+        <div class="exp-body">
+          <div class="exp-head">
+            <span class="yr">2022</span>
+          </div>
+          <h4>Foundations</h4>
+          <div class="org">Development Beginning</div>
+          <p>Started with JavaScript and systems-level thinking. Built the habits that turned into a full-stack career.</p>
+        </div>
       </div>
     </div>
   </section>
