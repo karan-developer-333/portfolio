@@ -1,1 +1,3 @@
-Instalert : https://instalert-frontend.vercel.app/
+Instalert : https://hackthon1.lysis.in/
+Course Finder : https://couse-finder.lysis.in/
+Shadow Deploy : https://shadow.lysis.in/
