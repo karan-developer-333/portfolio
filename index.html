@@ -101,6 +101,14 @@
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
+/* ===== Lenis smooth-scroll required styles ===== */
+/* Critical: disables native smooth-scroll so it doesn't fight Lenis (removes the "stuck" feel) */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-smooth iframe{pointer-events:none}
+
 /* Extremely smooth global background transitions */
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.52;-webkit-font-smoothing:antialiased;overflow-x:hidden;
   transition:background 1.5s var(--ease), color 1.5s var(--ease)}
@@ -787,7 +795,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       appHeader.classList.remove('scrolled');
     }
-  });
+  }, {passive: true});
 
   /* YEAR DISPLAY */
   document.getElementById('year').textContent = new Date().getFullYear();
@@ -798,13 +806,26 @@ window.addEventListener('DOMContentLoaded', () => {
   /* LENIS SMOOTH SCROLL */
   let lenis;
   if(window.Lenis && !reduce){
-    lenis = new Lenis({duration: 1.1, smoothWheel: true});
-    (function raf(t){lenis.raf(t); requestAnimationFrame(raf);})();
+    lenis = new Lenis({
+      duration: 1.1,
+      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5
+    });
     document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
       const el = document.querySelector(a.getAttribute('href'));
       if(el){ e.preventDefault(); lenis.scrollTo(el, {offset:-60}); }
     }));
-    if(window.gsap && window.ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+
+    /* Single unified RAF loop drives Lenis + ScrollTrigger so they stay in sync */
+    if(window.gsap && window.ScrollTrigger){
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add(time => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      (function raf(t){lenis.raf(t); requestAnimationFrame(raf);})();
+    }
   }
 
   /* PREMIUM MAGNETIC BUTTONS (Hero buttons class removed, remains only for footer/etc) */
@@ -996,6 +1017,21 @@ window.addEventListener('DOMContentLoaded', () => {
   async function fetchRealWeather() {
     const apiKey = "7c93ce53f129c17e60ac1af83d0f72ec";
 
+    // Accurate reverse geocoding: turn coords into a real city name.
+    // OpenWeatherMap's /weather endpoint returns the nearest station name (often a
+    // wrong suburb), so we resolve the city via the dedicated /geo reverse endpoint.
+    const reverseGeocodeCity = async (lat, lon) => {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`);
+        if (!res.ok) return "";
+        const arr = await res.json();
+        if (Array.isArray(arr) && arr.length) {
+          return arr[0].name || "";
+        }
+      } catch (e) { /* fall through to weather endpoint name */ }
+      return "";
+    };
+
     const fetchWeatherByCoords = async (lat, lon, cityName = "") => {
       try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
@@ -1004,7 +1040,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
         currentTemp = data.main.temp;
         currentWindSpeed = data.wind.speed * 3.6; // Convert m/s to km/h
-        currentCity = cityName || data.name || "Jaipur";
+        // Prefer an explicit city (from IP lookup), then accurate reverse geocode, then station name.
+        currentCity = cityName || await reverseGeocodeCity(lat, lon) || data.name || "Jaipur";
 
         const mainW = data.weather[0].main.toLowerCase();
 
@@ -1048,7 +1085,7 @@ window.addEventListener('DOMContentLoaded', () => {
         async () => {
           await fetchWeatherByIP();
         },
-        { timeout: 4000 }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
       );
     } else {
       await fetchWeatherByIP();
@@ -1092,6 +1129,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const weatherParticles = [];
   const splatSplashes = [];
   let layoutObstacles = [];
+  let scrollObstacleTimer = null;
 
   // Recalculate coordinates of target elements for collision splashes
   function updateCollisionObstacles() {
@@ -1113,7 +1151,16 @@ window.addEventListener('DOMContentLoaded', () => {
     ch = canvas.height = window.innerHeight;
     updateCollisionObstacles();
   });
-  window.addEventListener('scroll', updateCollisionObstacles);
+  /* Obstacles are stored in absolute (document) coordinates, so they don't change
+     while scrolling — only on resize/layout. Recomputing per scroll-frame caused
+     a forced reflow every frame, which was the main scroll-jank source. */
+  window.addEventListener('scroll', () => {
+    if (scrollObstacleTimer) return;
+    scrollObstacleTimer = setTimeout(() => {
+      updateCollisionObstacles();
+      scrollObstacleTimer = null;
+    }, 250);
+  }, {passive: true});
   setTimeout(updateCollisionObstacles, 1000); // Trigger initial delay lock for full client heights rendering
 
   // Particle object implementation supporting multi-weather conditions
